@@ -29,16 +29,15 @@
 
 // export { handler };
 
-
 // TypeScriptファイル: netlify/functions/linear-webhook.ts
-import { Handler } from '@netlify/functions';
+import { Handler } from "@netlify/functions";
 
 export const handler: Handler = async (event, context) => {
-  // HTTP リクエストの処理
-  // ここで、リクエストの検証、処理、レスポンスの生成を行います
+	// HTTP リクエストの処理
+	// ここで、リクエストの検証、処理、レスポンスの生成を行います
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Success" })
-  };
+	return {
+		statusCode: 200,
+		body: JSON.stringify({ message: "Success" }),
+	};
 };
