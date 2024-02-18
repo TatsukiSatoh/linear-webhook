@@ -31,10 +31,35 @@
 
 // TypeScriptファイル: netlify/functions/linear-webhook.ts
 import { Handler } from "@netlify/functions";
+import crypto from "crypto";
+
+const WEBHOOK_SECRET = process.env.LINEAR_WEBHOOK_SECRET || "";
 
 export const handler: Handler = async (event, context) => {
-	// HTTP リクエストの処理
-	// ここで、リクエストの検証、処理、レスポンスの生成を行います
+	if (event.httpMethod !== "POST") {
+		return { statusCode: 405, body: "Method Not Allowed" };
+	}
+
+	const signature = event.headers["linear-signature"] || "";
+	const rawBody = event.body || "";
+	const computedSignature = crypto
+		.createHmac("sha256", WEBHOOK_SECRET)
+		.update(rawBody, "utf8")
+		.digest("hex");
+
+	if (signature !== computedSignature) {
+		return { statusCode: 400, body: "Invalid signature" };
+	}
+
+	const payload = JSON.parse(rawBody);
+	const { action, data, type, createdAt } = payload;
+
+	console.log("=============================");
+	console.log(action);
+	console.log(data);
+	console.log(type);
+	console.log(createdAt);
+	console.log("=============================");
 
 	return {
 		statusCode: 200,
