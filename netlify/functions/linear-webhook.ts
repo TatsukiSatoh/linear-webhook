@@ -77,33 +77,33 @@ export const handler: Handler = async (event, context) => {
 	};
 };
 
-const fetchGithubRepositoryName = (labels: Label[]): string => {
-	const mappings = process.env
-		.LINEAR_LABEL_GITHUB_REPOSITORY_MAPPING as unknown as LinearLabelGithubRepositoryMapping[];
-	let result = "";
-	for (const label of labels) {
-		const mappingInfo = mappings.filter((v) => v.linearLabel === label.name);
-		if (mappingInfo.length) {
-			result = mappingInfo[0].githubRepository;
-			break;
-		}
-	}
+// const fetchGithubRepositoryName = (labels: Label[]): string => {
+// 	const mappings = process.env
+// 		.LINEAR_LABEL_GITHUB_REPOSITORY_MAPPING as unknown as LinearLabelGithubRepositoryMapping[];
+// 	let result = "";
+// 	for (const label of labels) {
+// 		const mappingInfo = mappings.filter((v) => v.linearLabel === label.name);
+// 		if (mappingInfo.length) {
+// 			result = mappingInfo[0].githubRepository;
+// 			break;
+// 		}
+// 	}
 
-	if (!result) {
-		result = GITHUB_DEFAULT_REPOSITORY;
-	}
+// 	if (!result) {
+// 		result = GITHUB_DEFAULT_REPOSITORY;
+// 	}
 
-	return result;
-};
+// 	return result;
+// };
 
-const mappingLinearUserToGithubUserName = (assignee: Assignee): string => {
-	const mappings = process.env
-		.LINEAR_USER_GITHUB_USER_MAPPING as unknown as LinearUserGithubUserMapping[];
+// const mappingLinearUserToGithubUserName = (assignee: Assignee): string => {
+// 	const mappings = process.env
+// 		.LINEAR_USER_GITHUB_USER_MAPPING as unknown as LinearUserGithubUserMapping[];
 
-	const info = mappings.filter((v) => v.linearUserId === assignee.id);
+// 	const info = mappings.filter((v) => v.linearUserId === assignee.id);
 
-	return info ? info[0].githubUserName : "";
-};
+// 	return info ? info[0].githubUserName : "";
+// };
 
 const createGitHubIssue = async (
 	repoName: string,
