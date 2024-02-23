@@ -125,5 +125,6 @@ const createGitHubIssue = async (
 		},
 		body: JSON.stringify({ title, body, assignees }),
 	});
+	console.log(response);
 	return response.json();
 };
