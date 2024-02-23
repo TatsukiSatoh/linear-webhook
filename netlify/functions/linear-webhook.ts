@@ -71,7 +71,7 @@ export const handler: Handler = async (event, context) => {
 		"mypage-front",
 		data.title,
 		data.id,
-		[],
+		["TatsukiSatoh"],
 	);
 
 	console.log(createIssueResponse);
