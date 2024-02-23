@@ -71,7 +71,7 @@ export const handler: Handler = async (event, context) => {
 		"mypage-front",
 		data.title,
 		data.id,
-		["TatsukiSatoh"],
+		[],
 	);
 
 	console.log(createIssueResponse);
@@ -116,6 +116,7 @@ const createGitHubIssue = async (
 	body: string,
 	assignees: string[],
 ) => {
+	console.log(GITHUB_OWNER_NAME);
 	const url = `https://api.github.com/repos/${GITHUB_OWNER_NAME}/${repoName}/issues`;
 	const response = await fetch(url, {
 		method: "POST",
