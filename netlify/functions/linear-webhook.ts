@@ -67,9 +67,14 @@ export const handler: Handler = async (event, context) => {
 	// delete -> githubのissueを検索する -> 対象のissueをcloseする
 
 	// 固定値でissueを作成できるか動作確認
-	await createGitHubIssue("mypage-front", data.title, data.id, [
-		"TatsukiSatoh",
-	]);
+	const createIssueResponse = await createGitHubIssue(
+		"mypage-front",
+		data.title,
+		data.id,
+		["TatsukiSatoh"],
+	);
+
+	console.log(createIssueResponse);
 
 	return {
 		statusCode: 200,
