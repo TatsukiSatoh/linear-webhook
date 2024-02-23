@@ -10,7 +10,7 @@ import {
 import crypto from "crypto";
 
 const WEBHOOK_SECRET = process.env.LINEAR_WEBHOOK_SECRET || "";
-const GITHUB_TOKEN = process.env.LINEAR_WEBHOOK_SECRET || "";
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 const GITHUB_OWNER_NAME = process.env.GITHUB_OWNER_NAME || "";
 const GITHUB_DEFAULT_REPOSITORY = process.env.GITHUB_DEFAULT_REPOSITORY || "";
 
