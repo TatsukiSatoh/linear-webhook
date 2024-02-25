@@ -82,33 +82,37 @@ export const handler: Handler = async (event, context) => {
 	};
 };
 
-// const fetchGithubRepositoryName = (labels: Label[]): string => {
-// 	const mappings = process.env
-// 		.LINEAR_LABEL_GITHUB_REPOSITORY_MAPPING as unknown as LinearLabelGithubRepositoryMapping[];
-// 	let result = "";
-// 	for (const label of labels) {
-// 		const mappingInfo = mappings.filter((v) => v.linearLabel === label.name);
-// 		if (mappingInfo.length) {
-// 			result = mappingInfo[0].githubRepository;
-// 			break;
-// 		}
-// 	}
+const fetchGithubRepositoryName = (labels: Label[]): string => {
+	if (!labels.length) {
+		return GITHUB_DEFAULT_REPOSITORY;
+	}
 
-// 	if (!result) {
-// 		result = GITHUB_DEFAULT_REPOSITORY;
-// 	}
+	const mappings = process.env
+		.LINEAR_LABEL_GITHUB_REPOSITORY_MAPPING as unknown as LinearLabelGithubRepositoryMapping[];
+	let result = "";
+	for (const label of labels) {
+		const mappingInfo = mappings.filter((v) => v.linearLabel === label.name);
+		if (mappingInfo.length) {
+			result = mappingInfo[0].githubRepository;
+			break;
+		}
+	}
 
-// 	return result;
-// };
+	if (!result) {
+		result = GITHUB_DEFAULT_REPOSITORY;
+	}
 
-// const mappingLinearUserToGithubUserName = (assignee: Assignee): string => {
-// 	const mappings = process.env
-// 		.LINEAR_USER_GITHUB_USER_MAPPING as unknown as LinearUserGithubUserMapping[];
+	return result;
+};
 
-// 	const info = mappings.filter((v) => v.linearUserId === assignee.id);
+const mappingLinearUserToGithubUserName = (creatorId: string): string => {
+	const mappings = process.env
+		.LINEAR_USER_GITHUB_USER_MAPPING as unknown as LinearUserGithubUserMapping[];
 
-// 	return info ? info[0].githubUserName : "";
-// };
+	const info = mappings.filter((v) => v.linearUserId === creatorId);
+
+	return info ? info[0].githubUserName : "";
+};
 
 const createGitHubIssue = async (
 	repoName: string,
@@ -128,4 +132,19 @@ const createGitHubIssue = async (
 	});
 	console.log(response);
 	return response.json();
+};
+
+const create = async (data: LinearIssue) => {
+	console.log("================= 【start】CREATE =================");
+
+	const creatorGithubId = mappingLinearUserToGithubUserName(data.creatorId);
+	const createToRepositoryName = fetchGithubRepositoryName(data.labels);
+
+	const title = data.title;
+	const body = data.id;
+	const assignees = [creatorGithubId];
+
+	createGitHubIssue(createToRepositoryName, title, body, assignees);
+
+	console.log("================= 【end】CREATE =================");
 };
