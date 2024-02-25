@@ -74,3 +74,18 @@ export interface LinearLabelGithubRepositoryMapping {
 	linearLabel: string;
 	githubRepository: string;
 }
+
+export interface GitHubIssue {
+	id: number;
+	html_url: string;
+	title: string;
+	state: string;
+	number: number;
+	body: string;
+}
+
+export interface GitHubSearchResponse {
+	total_count: number;
+	incomplete_results: boolean;
+	items: GitHubIssue[];
+}

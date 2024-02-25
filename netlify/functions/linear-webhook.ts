@@ -1,4 +1,3 @@
-// TypeScriptファイル: netlify/functions/linear-webhook.ts
 import { Handler } from "@netlify/functions";
 import {
 	LinearIssue,
@@ -6,6 +5,7 @@ import {
 	LinearLabelGithubRepositoryMapping,
 	Assignee,
 	LinearUserGithubUserMapping,
+	GitHubSearchResponse,
 } from "./type";
 import crypto from "crypto";
 
@@ -147,4 +147,78 @@ const create = async (data: LinearIssue) => {
 	createGitHubIssue(createToRepositoryName, title, body, assignees);
 
 	console.log("================= 【end】CREATE =================");
+};
+
+const searchGitHubIssues = async (
+	linearIssueId: string,
+	repoName: string,
+): Promise<number | null> => {
+	const query = encodeURIComponent(
+		`"${linearIssueId}" in:body repo:${GITHUB_OWNER_NAME}/${repoName}`,
+	);
+	const url = `https://api.github.com/search/issues?q=${query}`;
+
+	const response = await fetch(url, {
+		headers: {
+			Authorization: `token ${GITHUB_TOKEN}`,
+			Accept: "application/vnd.github.v3+json",
+		},
+	});
+
+	if (!response.ok) {
+		console.error("Search request failed:", response.statusText);
+		return null;
+	}
+
+	const data = (await response.json()) as GitHubSearchResponse;
+	if (data.items.length === 0) {
+		console.log("No issues found with the specified Linear Issue ID.");
+		return null;
+	}
+
+	return data.items[0].number;
+};
+
+const closeGithubIssue = async (repoName: string, issueNumber: number) => {
+	const url = `https://api.github.com/repos/${GITHUB_OWNER_NAME}/${repoName}/issues/${issueNumber}`;
+
+	const response = await fetch(url, {
+		method: "PATCH",
+		headers: {
+			Authorization: `token ${GITHUB_TOKEN}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ state: "closed" }),
+	});
+
+	console.log(response);
+};
+
+const update = async (data: LinearIssue) => {
+	const mappings = process.env
+		.LINEAR_LABEL_GITHUB_REPOSITORY_MAPPING as unknown as LinearLabelGithubRepositoryMapping[];
+
+	const linearIssueId = data.id;
+
+	let githubIssueNumber: number | null = null;
+	let githubRepoName = "";
+
+	for (const mapping of mappings) {
+		const repoName = mapping.githubRepository;
+		githubIssueNumber = await searchGitHubIssues(linearIssueId, repoName);
+		if (githubIssueNumber) {
+			githubRepoName = repoName;
+			break;
+		}
+	}
+
+	if (!githubIssueNumber || !githubRepoName) {
+		console.log("Not found issue ot Repository");
+		return;
+	}
+
+	// statusがdoneになった時だけ、githubのissueをcloseする
+	if (data.state.type === "completed") {
+		closeGithubIssue(githubRepoName, githubIssueNumber);
+	}
 };
